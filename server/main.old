@@ -1,0 +1,31 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net"
+
+	"github.com/qinyul/go-grpc-openapi-demo/pb"
+	"google.golang.org/grpc"
+)
+
+type server struct {
+	pb.UnimplementedServiceServer
+}
+
+func (s *server) CreateItem(ctx context.Context, req *pb.CreateItemRequest) (*pb.GetItemResponse, error) {
+	return &pb.GetItemResponse{Id: "123", Name: "test", Description: "test"}, nil
+}
+
+func main() {
+	lis, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	grpcServer := grpc.NewServer()
+	pb.RegisterServiceServer(grpcServer, &server{})
+	log.Println("gRPC server listening on :50051")
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}

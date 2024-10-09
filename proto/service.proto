@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package service;
+
+import "proto/annotations.proto";
+
+option go_package = "/pb";
+
+import "proto/protoc-gen-openapiv2/options/annotations.proto";
+
+message CreateItemRequest {
+    string id = 1;
+}
+
+message GetItemResponse {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+}
+
+service Service {
+    rpc CreateItem (CreateItemRequest) returns (GetItemResponse) {
+        option (google.api.http) = {
+            post: "/v1/create"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create item";
+            description:"Create new item";
+        };
+    }
+}

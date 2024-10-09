@@ -1,0 +1,27 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/qinyul/go-grpc-openapi-demo/pb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+func main() {
+	ctx := context.Background()
+	mux := runtime.NewServeMux()
+
+	err := pb.RegisterServiceHandlerFromEndpoint(ctx, mux, "localhost:50051", []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())})
+	if err != nil {
+		log.Fatalf("Failed to register handler: %v", err)
+	}
+
+	log.Println("HTTP server listening on :8000")
+	if err := http.ListenAndServe(":8000", mux); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
+}
